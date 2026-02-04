@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "notes": [
+    "כיתה אינה הקבצה.",
+    "לכל תלמיד יש כיתת אם.",
+    "כיתות מדעיות: ז1, ח1, ט1.",
+    "כיתות מקדמות: ז2, ח2, ט2 (ייתכן שילוב בכיתה רגילה)."
+  ],
+  "classes": [
+    {"grade": "ז", "homeroom_class": "ז1", "type": "מדעית", "homeroom_teachers": []},
+    {"grade": "ז", "homeroom_class": "ז2", "type": "מקדמת", "homeroom_teachers": []},
+    {"grade": "ז", "homeroom_class": "ז3", "type": "רגילה", "homeroom_teachers": ["אליעד לביא", "חני לוי"]},
+    {"grade": "ז", "homeroom_class": "ז4", "type": "רגילה", "homeroom_teachers": []},
+
+    {"grade": "ח", "homeroom_class": "ח1", "type": "מדעית", "homeroom_teachers": ["דורין"]},
+    {"grade": "ח", "homeroom_class": "ח2", "type": "מקדמת", "homeroom_teachers": ["גחלית עג'מי"]},
+    {"grade": "ח", "homeroom_class": "ח3", "type": "רגילה", "homeroom_teachers": []},
+    {"grade": "ח", "homeroom_class": "ח4", "type": "רגילה", "homeroom_teachers": []},
+
+    {"grade": "ט", "homeroom_class": "ט1", "type": "מדעית", "homeroom_teachers": ["שלומית בדיחי"]},
+    {"grade": "ט", "homeroom_class": "ט2", "type": "מקדמת", "homeroom_teachers": ["מירית אפריים"]},
+    {"grade": "ט", "homeroom_class": "ט3", "type": "רגילה", "homeroom_teachers": ["נורית מויאל"]},
+    {"grade": "ט", "homeroom_class": "ט4", "type": "רגילה", "homeroom_teachers": ["סיגל בן אלי"]},
+    {"grade": "ט", "homeroom_class": "ט5", "type": "רגילה", "homeroom_teachers": []}
+  ]
+}

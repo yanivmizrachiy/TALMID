@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <a class="link text-white/70" href="/">← חזרה לבית</a>
+      <h1 class="text-2xl md:text-3xl font-bold mt-2">שכבת {{ grade }}</h1>
+      <div class="text-white/70 mt-1"><b class="text-white">{{ total_students }}</b> תלמידים בשכבה</div>
+    </div>
+  </div>
+
+  {% set gc = 'grade-z' if grade == 'ז' else ('grade-h' if grade == 'ח' else 'grade-t') %}
+
+  <section class="mt-6 flex flex-col gap-3">
+    {% for g in groups %}
+      <a class="glass soft-shadow rounded-3xl p-4 btn block grade-card group-btn {{ gc }} tint-{{ loop.index0 % 6 }}" href="{{ url_group(g) }}">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="text-lg font-semibold">הקבצה {{ g.group_name }}{% if g.variant %} <span class="text-white/60">({{ g.variant }})</span>{% endif %}</div>
+            <div class="text-white/70 mt-1"><b class="text-white">{{ g.student_count }}</b> תלמידים בהקבצה</div>
+          </div>
+        </div>
+
+        <div class="mt-4 text-white/75">
+          {% set ts = group_teachers[g.id] %}
+          {% if ts and ts|length == 1 %}
+            מורה
+          {% else %}
+            מורים
+          {% endif %}
+          {% set ts = group_teachers[g.id] %}
+          {% if ts and ts|length > 0 %}
+            {% for t in ts %}
+              <span class="text-white/90">{{ t.name }}</span>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          {% else %}
+            <span class="text-white/50">(לא הוגדר)</span>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </section>
+{% endblock %}

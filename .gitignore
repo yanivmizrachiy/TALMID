@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.venv-tools/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local web app DB/cache
+צוות מורים/אתר/data/
+

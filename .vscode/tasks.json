@@ -1,0 +1,82 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "TALMID: Setup (venv + deps)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\צוות מורים\\אתר\\setup.ps1"
+      ]
+    },
+    {
+      "label": "TALMID: Refresh Data (pipeline)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\צוות מורים\\refresh_data.ps1"
+      ]
+    },
+    {
+      "label": "TALMID: Sync DB",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\צוות מורים\\אתר\\sync.ps1"
+      ]
+    },
+    {
+      "label": "TALMID: Refresh + Sync",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "TALMID: Refresh Data (pipeline)",
+        "TALMID: Sync DB"
+      ]
+    },
+    {
+      "label": "TALMID: Run Web (reload)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\צוות מורים\\אתר\\run.ps1"
+      ]
+    },
+    {
+      "label": "TALMID: Stop Web",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\צוות מורים\\אתר\\stop.ps1"
+      ]
+    },
+    {
+      "label": "TALMID: Run All (refresh + sync + run)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "TALMID: Setup (venv + deps)",
+        "TALMID: Refresh + Sync",
+        "TALMID: Run Web (reload)"
+      ]
+    }
+  ]
+}

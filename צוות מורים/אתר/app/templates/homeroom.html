@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+  <a class="link text-white/70" href="{{ url_grade(homeroom.grade) }}">← חזרה לשכבת {{ homeroom.grade }}</a>
+  <h1 class="text-2xl md:text-3xl font-bold mt-2">כיתת אם {{ homeroom.code }}</h1>
+  <div class="text-white/70 mt-1"><b class="text-white">{{ homeroom.type }}</b></div>
+
+  <div class="glass soft-shadow rounded-3xl p-6 mt-6">
+    <div class="text-white/70">מחנך/ת</div>
+    <div class="mt-2 text-white/90">
+      {% if teachers and teachers|length > 0 %}
+        {% for t in teachers %}
+          <a class="link" href="{{ url_teacher(t) }}">{{ t.name }}</a>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+      {% else %}
+        <span class="text-white/50">(לא הוגדר)</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <section class="glass soft-shadow rounded-3xl p-4 mt-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+      <div class="text-sm text-white/60">סינון מהיר לפי תלמיד/הקבצה</div>
+      <div class="flex items-center gap-2">
+        <input
+          class="w-full md:w-80 px-3 py-2 rounded-xl bg-white/5 border border-white/10"
+          placeholder="סינון..."
+          data-filter-table="homeroom-table"
+          data-filter-count="homeroom-count"
+        />
+        <span id="homeroom-count" class="badge">{{ students|length }}</span>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table" id="homeroom-table">
+        <thead>
+          <tr class="text-white/80 text-sm">
+            <th class="text-right">#</th>
+            <th class="text-right">תלמיד</th>
+            <th class="text-right">הקבצה במתמטיקה</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+            <tr data-row>
+              <td class="text-white/70">{{ loop.index }}</td>
+              <td><a class="link font-medium" href="{{ url_student(s) }}">{{ s.full_name }}</a></td>
+              <td class="text-white/80">
+                {% set gs = math_groups_by_student.get(s.id) %}
+                {% if gs and gs|length > 0 %}
+                  {% for g in gs %}
+                    <a class="link" href="{{ url_group(g) }}">{{ g.group_name }}{% if g.variant %} ({{ g.variant }}){% endif %}</a>{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <span class="text-white/50">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

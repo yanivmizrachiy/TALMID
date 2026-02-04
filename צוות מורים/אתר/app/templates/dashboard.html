@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl md:text-3xl font-bold">נתונים</h1>
+      {% if last_sync_at %}
+        <div class="text-white/55 mt-2 text-sm">סנכרון אחרון <span class="text-white/80">{{ last_sync_at }}</span></div>
+      {% endif %}
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="badge"><b class="text-white">{{ total_students }}</b> תלמידים</span>
+      <span class="badge"><b class="text-white">{{ total_groups }}</b> הקבצות</span>
+      <span class="badge"><b class="text-white">{{ total_teachers }}</b> מורים</span>
+      <a class="px-4 py-2 rounded-2xl glass btn font-semibold" href="/חיפוש">חיפוש</a>
+    </div>
+  </div>
+
+  <section class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="glass soft-shadow rounded-3xl p-6 lg:col-span-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">תלמידים לפי שכבה</h2>
+        <div class="text-sm text-white/55">ז/ח/ט</div>
+      </div>
+      <div class="mt-4">
+        <canvas id="chartPerGrade" height="120"></canvas>
+      </div>
+    </div>
+
+    <div class="glass soft-shadow rounded-3xl p-6">
+      <h2 class="text-lg font-semibold">ממוצעי ציונים</h2>
+
+      <div class="mt-4 grid grid-cols-1 gap-3 text-white/85">
+        <div class="glass rounded-2xl p-4">
+          <div class="text-xs text-white/60">שורות מדדים</div>
+          <div class="mt-1 text-xl font-semibold">{{ metrics_summary.rows or 0 }}</div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-white/60">מחצית</div>
+            <div class="mt-1 font-semibold">{{ (metrics_summary.avg_term or 0) | round(1) }}</div>
+          </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-white/60">מבחן 1</div>
+            <div class="mt-1 font-semibold">{{ (metrics_summary.avg_test1 or 0) | round(1) }}</div>
+          </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-xs text-white/60">מבחן 2</div>
+            <div class="mt-1 font-semibold">{{ (metrics_summary.avg_test2 or 0) | round(1) }}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="glass soft-shadow rounded-3xl p-6">
+      <h2 class="text-lg font-semibold">הקבצות גדולות (Top 12)</h2>
+      <div class="mt-4 flex flex-col gap-2">
+        {% for g in group_sizes %}
+          <a class="glass btn rounded-2xl p-3 link" href="{{ url_group(g) }}">
+            <div class="flex items-center justify-between gap-2">
+              <div class="font-medium">שכבת {{ g.grade }} – {{ g.subject }} – {{ g.group_name }}{% if g.variant %} ({{ g.variant }}){% endif %}</div>
+              <span class="badge">{{ g.student_count }}</span>
+            </div>
+          </a>
+        {% endfor %}
+        {% if group_sizes|length == 0 %}
+          <div class="text-white/50">אין נתונים להצגה.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="glass soft-shadow rounded-3xl p-6">
+      <h2 class="text-lg font-semibold">עומס מורים (Top 12)</h2>
+      <div class="mt-4 flex flex-col gap-2">
+        {% for t in teacher_load %}
+          <a class="glass btn rounded-2xl p-3 link" href="{{ url_teacher(t) }}">
+            <div class="flex items-center justify-between gap-2">
+              <div class="font-medium">{{ t.name }}</div>
+              <div class="flex items-center gap-2">
+                <span class="badge">{{ t.group_count }} הקבצות</span>
+                <span class="badge">{{ t.student_count }} תלמידים</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+        {% if teacher_load|length == 0 %}
+          <div class="text-white/50">אין נתונים להצגה.</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    (function(){
+      const labels = {{ per_grade_labels | tojson }};
+      const values = {{ per_grade_values | tojson }};
+
+      const ctx = document.getElementById('chartPerGrade');
+      if (!ctx) return;
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'תלמידים',
+            data: values,
+            borderWidth: 1,
+            backgroundColor: 'rgba(124, 58, 237, 0.55)',
+            borderColor: 'rgba(168, 85, 247, 0.75)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { ticks: { color: 'rgba(255,255,255,0.8)' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+            y: { ticks: { color: 'rgba(255,255,255,0.8)' }, grid: { color: 'rgba(255,255,255,0.08)' } }
+          }
+        }
+      });
+    })();
+  </script>
+{% endblock %}

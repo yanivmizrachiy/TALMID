@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <a class="link text-white/70" href="javascript:history.back()">← חזרה</a>
+      <h1 class="text-2xl md:text-3xl font-bold mt-2">{{ student.full_name }}</h1>
+      <div class="text-white/70 mt-1 flex flex-wrap gap-2">
+        {% if student.grade %}<span class="badge">שכבה {{ student.grade }}</span>{% endif %}
+        {% if student.homeroom_code %}<a class="badge link" href="{{ url_homeroom(student.homeroom_code) }}">כיתת אם {{ student.homeroom_code }}</a>{% endif %}
+      </div>
+      {% if student.notes %}
+        <div class="mt-4 glass rounded-2xl p-4 text-white/80">
+          <div class="text-sm text-white/60 mb-1">הערות</div>
+          <div class="whitespace-pre-wrap">{{ student.notes }}</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="glass soft-shadow rounded-3xl p-4 w-full max-w-sm">
+      <div class="text-white/70 text-sm">שייך להקבצות</div>
+      <div class="mt-2 flex flex-col gap-2">
+        {% for g in memberships %}
+          <a class="glass btn rounded-2xl p-3 link" href="{{ url_group(g) }}">
+            {{ g.subject }} – {{ g.grade }} – {{ g.group_name }}{% if g.variant %} ({{ g.variant }}){% endif %}
+          </a>
+        {% endfor %}
+        {% if memberships|length == 0 %}
+          <div class="text-white/50">(לא שובץ עדיין)</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <section class="mt-6 grid grid-cols-1 gap-4">
+    <div class="glass soft-shadow rounded-3xl p-6">
+      <h2 class="text-lg font-semibold">ציונים / מדדים</h2>
+      <form class="mt-4 space-y-3" method="post" action="{{ url_student(student) }}/מדדים">
+        <div>
+          <label class="text-sm text-white/70">ציון מחצית במתמטיקה</label>
+          <input name="math_term_grade" value="{{ metrics.math_term_grade if metrics else '' }}" class="mt-1 w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm text-white/70">מבחן 1</label>
+            <input name="math_test1" value="{{ metrics.math_test1 if metrics else '' }}" class="mt-1 w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10" />
+          </div>
+          <div>
+            <label class="text-sm text-white/70">מבחן 2</label>
+            <input name="math_test2" value="{{ metrics.math_test2 if metrics else '' }}" class="mt-1 w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10" />
+          </div>
+        </div>
+        <div>
+          <label class="text-sm text-white/70">הערת התנהגות/למידה</label>
+          <textarea name="behavior_note" rows="3" class="mt-1 w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10">{{ metrics.behavior_note if metrics else '' }}</textarea>
+        </div>
+        <div>
+          <label class="text-sm text-white/70">שדות נוספים (JSON)</label>
+          <textarea name="extra_json" rows="3" class="mt-1 w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10">{{ metrics.extra_json if metrics and metrics.extra_json else '' }}</textarea>
+        </div>
+        <button class="w-full px-4 py-2 rounded-2xl glass btn font-semibold">שמור</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}

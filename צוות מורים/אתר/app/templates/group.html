@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <a class="link text-white/70" href="{{ url_grade(group.grade) }}">← חזרה לשכבת {{ group.grade }}</a>
+      <h1 class="text-2xl md:text-3xl font-bold mt-2">
+        הקבצה {{ group.group_name }}
+        {% if group.variant %}<span class="text-white/60 text-base">({{ group.variant }})</span>{% endif %}
+      </h1>
+      <div class="text-white/70 mt-1"><b class="text-white">{{ total_students }}</b> תלמידים בהקבצה</div>
+      <div class="text-white/70 mt-1">
+        {% if teachers and teachers|length == 1 %}
+          מורה למתמטיקה
+        {% else %}
+          מורים למתמטיקה
+        {% endif %}
+        {% if teachers and teachers|length > 0 %}
+          {% for t in teachers %}
+            <a class="link" href="{{ url_teacher(t) }}">{{ t.name }}</a>{% if not loop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          <span class="text-white/50">(לא הוגדר)</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2 items-end">
+      {% set gc = 'grade-z' if group.grade == 'ז' else ('grade-h' if group.grade == 'ח' else 'grade-t') %}
+      <span class="badge grade-chip {{ gc }}">שכבה {{ group.grade }}</span>
+      <span class="badge">מתמטיקה</span>
+    </div>
+  </div>
+
+  <section class="glass soft-shadow rounded-3xl p-4 mt-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+      <div class="text-sm text-white/60">סינון מהיר לפי שם/כיתה/ציון</div>
+      <div class="flex items-center gap-2">
+        <input
+          class="w-full md:w-80 px-3 py-2 rounded-xl bg-white/5 border border-white/10"
+          placeholder="סינון..."
+          data-filter-table="group-table"
+          data-filter-count="group-count"
+        />
+        <span id="group-count" class="badge">{{ total_students }}</span>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table" id="group-table">
+        <thead>
+          <tr class="text-white/80 text-sm">
+            <th class="text-right">#</th>
+            <th class="text-right">שם משפחה</th>
+            <th class="text-right">שם פרטי</th>
+            <th class="text-right">כיתת אם</th>
+            <th class="text-right">ציון מחצית</th>
+            <th class="text-right">מבחן 1</th>
+            <th class="text-right">מבחן 2</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+            <tr data-row>
+              <td class="text-white/70">{{ loop.index }}</td>
+              <td>
+                <a class="link font-medium" href="{{ url_student(s) }}">{{ s.last_name or s.full_name }}</a>
+              </td>
+              <td>{{ s.first_name or "" }}</td>
+              <td>
+                {% if s.homeroom_code %}
+                  <a class="link" href="{{ url_homeroom(s.homeroom_code) }}">{{ s.homeroom_code }}</a>
+                {% else %}
+                  <span class="text-white/50">—</span>
+                {% endif %}
+              </td>
+              <td class="text-white/85">{{ s.math_term_grade if s.math_term_grade is not none else "" }}</td>
+              <td class="text-white/85">{{ s.math_test1 if s.math_test1 is not none else "" }}</td>
+              <td class="text-white/85">{{ s.math_test2 if s.math_test2 is not none else "" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 text-sm text-white/60">
+      עריכה של ציונים/מדדים נשמרת בעמוד התלמיד.
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+  <a class="link text-white/70" href="/">← חזרה לבית</a>
+  <h1 class="text-2xl md:text-3xl font-bold mt-2">צוות מתמטיקה תשפ"ו</h1>
+
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for t in teachers %}
+      <a class="glass soft-shadow rounded-3xl p-6 btn block" href="{{ url_teacher(t) }}">
+        <div class="text-xl font-semibold">{{ t.name }}</div>
+        <div class="text-white/70 mt-2"><b class="text-white">{{ t.group_count }}</b> הקבצות</div>
+        <div class="text-white/70 mt-1"><b class="text-white">{{ t.student_count }}</b> תלמידים</div>
+      </a>
+    {% endfor %}
+    {% if teachers|length == 0 %}
+      <div class="text-white/50">אין נתונים להצגה.</div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{
+  "source_excel": "הקבצות_מבחן_מיפוי_במקום_הערכה1.xlsx",
+  "source_sheet": "ח׳ א1",
+  "group_folder": "הקבצות/ח/מתמטיקה/א1_1",
+  "import_note": "נוצר אוטומטית מייבוא אקסל",
+  "detected": {
+    "header_row": 2,
+    "headers": [
+      "שם משפחה",
+      "שם פרטי",
+      "כיתה",
+      "הערכה 1",
+      "הערכה 2",
+      "הערכה 3",
+      "הערכה 4",
+      "הערכה 5",
+      "הערות"
+    ],
+    "columns": {
+      "student_id": null,
+      "first_name": 2,
+      "last_name": 1,
+      "full_name": 1,
+      "homeroom_class": 3,
+      "notes": 9
+    }
+  },
+  "counts": {
+    "students": 14
+  }
+}

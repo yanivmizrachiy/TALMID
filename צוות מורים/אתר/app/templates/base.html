@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title or app_title }}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script defer src="/static/app.js"></script>
+</head>
+<body class="min-h-screen {{ theme_class }}">
+  <header class="sticky top-0 z-20 border-b border-white/10 bg-black/20 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a class="text-lg font-semibold tracking-tight link" href="/">{{ app_title }}</a>
+      <div class="flex items-center gap-2">
+        <form class="hidden md:block" method="get" action="/חיפוש">
+          <input name="q" placeholder="חיפוש תלמיד/מורה/כיתה..." class="w-72 px-3 py-2 rounded-xl bg-white/5 border border-white/10" />
+        </form>
+        <nav class="flex items-center gap-2">
+          <a class="px-3 py-2 rounded-xl glass btn" href="/">בית</a>
+          <a class="px-3 py-2 rounded-xl glass btn" href="/דשבורד">נתונים</a>
+          <a class="px-3 py-2 rounded-xl glass btn" href="/מפה">מפה</a>
+          <a class="px-3 py-2 rounded-xl glass btn" href="/מורים">מורים</a>
+          <span class="badge">{{ now.strftime('%d/%m/%Y') }}</span>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 fade-in">
+    {% if breadcrumbs %}
+      <div class="mb-5 flex flex-wrap items-center gap-2 text-sm text-white/70">
+        {% for c in breadcrumbs %}
+          {% if c.url and not loop.last %}
+            <a class="link glass rounded-xl px-3 py-1 btn" href="{{ c.url }}">{{ c.label }}</a>
+            <span class="text-white/35">/</span>
+          {% else %}
+            <span class="glass rounded-xl px-3 py-1">{{ c.label }}</span>
+            {% if not loop.last %}<span class="text-white/35">/</span>{% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>
