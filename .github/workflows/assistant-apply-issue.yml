@@ -1,0 +1,60 @@
+name: Assistant Apply (Issue -> Commit)
+on:
+  issues:
+    types: [opened, edited, labeled]
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: apply-issue
+  cancel-in-progress: false
+jobs:
+  apply:
+    if: contains(join(github.event.issue.labels.*.name, ','), 'gpt-apply')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract patch from issue body
+        id: extract
+        run: |
+          python - <<'PY'
+          import os, re, sys, json
+          body = os.environ.get("ISSUE_BODY","")
+          m = re.search(r"```patch\\s*(.*?)\\s*```", body, re.S)
+          if not m:
+            print("No ```patch block found", file=sys.stderr)
+            sys.exit(2)
+          patch = m.group(1).strip() + "\n"
+          open("issue.patch","w",encoding="utf-8").write(patch)
+          print("OK")
+          PY
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+      - name: Apply patch
+        run: |
+          git apply --whitespace=nowarn issue.patch
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Apply patch from issue #${{ github.event.issue.number }}"
+            git push
+          fi
+      - name: Comment success
+        if: success()
+        run: |
+          gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments" \
+            -f body="✅ Applied successfully. Commit pushed to default branch."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Comment failure
+        if: failure()
+        run: |
+          gh api -X POST "repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments" \
+            -f body="❌ Apply failed. ודא שיש בלוק ```patch בגוף ה-Issue, ושה-patch תקין."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
