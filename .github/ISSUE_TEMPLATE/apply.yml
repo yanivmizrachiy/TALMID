@@ -1,0 +1,24 @@
+name: Apply patch (Auto)
+description: הדבק כאן בלוק patch, והאוטומציה תבצע commit
+labels: ["gpt-apply"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        הדבק למטה בלוק ```patch. בלי זה – האוטומציה תיעצר.
+  - type: textarea
+    id: patch
+    attributes:
+      label: Patch
+      description: חייב להיות בתוך ```patch
+      value: |
+        ```patch
+        *** Begin Patch
+        *** Update File: README.md
+        @@
+        -Old
+        +New
+        *** End Patch
+        ```
+    validations:
+      required: true
