@@ -25,18 +25,18 @@
 }
 
 body[data-grade="z"] {
-  --accent: #1d4ed8;
-  --accent2: #1e40af;
+  --accent: var(--gradeZ);
+  --accent2: #db2777;
 }
 
 body[data-grade="h"] {
-  --accent: #6d28d9;
-  --accent2: #5b21b6;
+  --accent: var(--gradeH);
+  --accent2: #16a34a;
 }
 
 body[data-grade="t"] {
-  --accent: #0f766e;
-  --accent2: #115e59;
+  --accent: var(--gradeT);
+  --accent2: #ea580c;
 }
 
 * {
@@ -114,6 +114,18 @@ body[data-page="home"] .btn[data-grade="h"] {
 
 body[data-page="home"] .btn[data-grade="t"] {
   border-color: color-mix(in srgb, var(--gradeT), black 8%);
+}
+
+body[data-page="home"] .btn[data-grade="z"] .btn__title {
+  color: var(--gradeZ);
+}
+
+body[data-page="home"] .btn[data-grade="h"] .btn__title {
+  color: var(--gradeH);
+}
+
+body[data-page="home"] .btn[data-grade="t"] .btn__title {
+  color: var(--gradeT);
 }
 
 .header {
