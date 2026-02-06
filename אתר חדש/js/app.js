@@ -83,9 +83,10 @@ function installFastNav() {
 
     ev.preventDefault();
     document.body.classList.add("is-leaving");
+    // Keep the delay extremely short so navigation feels instant.
     window.setTimeout(() => {
       window.location.href = url.href;
-    }, 120);
+    }, 60);
   });
 }
 
