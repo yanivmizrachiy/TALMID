@@ -121,7 +121,7 @@ data.json (SCHEMA – DO NOT INVENT DATA)
         { "id": "z_madit", "name": "ז מדעית", "teacher": "טל נחמיה", "students": [] },
         { "id": "z_a", "name": "ז הקבצה א", "teacher": "אילנית רז", "students": [] },
         { "id": "z_a1", "name": "ז הקבצה א1", "teacher": "יניב רז", "students": [] },
-        { "id": "z_mekademet", "name": "ז מקדמת", "teacher": "הילה הנסב", "students": [] }
+        { "id": "z_mekademet", "name": "ז הקבצה מקדמת", "teacher": "הילה הנסב", "students": [] }
       ]
     },
     {
