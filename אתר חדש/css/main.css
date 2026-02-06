@@ -1,0 +1,235 @@
+:root {
+  --bg: #f3f4f6;
+  --panel: #ffffff;
+  --border: #d1d5db;
+  --text: #111827;
+  --muted: #374151;
+
+  --accent: #2563eb;
+  --groupName: #0b2a6f;
+  --teacher: #0a7a78;
+  --num: #c1121f;
+
+  --radius: 12px;
+}
+
+body[data-grade="z"] {
+  --accent: #2563eb;
+}
+
+body[data-grade="h"] {
+  --accent: #7c3aed;
+}
+
+body[data-grade="t"] {
+  --accent: #0f766e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.header {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.header__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header__titles {
+  min-width: 0;
+}
+
+.header__title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.header__subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.3;
+  opacity: 0.95;
+}
+
+.header__managed {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  opacity: 0.95;
+  white-space: nowrap;
+}
+
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.buttons {
+  display: grid;
+  gap: 10px;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.btn__title {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.btn__meta {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.num {
+  color: var(--num);
+  font-weight: 800;
+}
+
+.summary {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.groups {
+  display: grid;
+  gap: 10px;
+}
+
+.groupCard {
+  display: block;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 12px;
+  min-height: 56px;
+}
+
+.groupCard__name {
+  color: var(--groupName);
+  font-weight: 900;
+  font-size: 16px;
+  margin: 0;
+}
+
+.groupCard__teacher {
+  color: var(--teacher);
+  font-weight: 800;
+  font-size: 14px;
+  margin: 6px 0 0;
+}
+
+.groupCard__count {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tableWrap {
+  overflow-x: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #ffffff;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--border);
+  padding: 10px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.table th {
+  text-align: right;
+  background: #ffffff;
+  font-weight: 900;
+}
+
+.colNum {
+  width: 46px;
+}
+
+.rowNum {
+  color: var(--num);
+  font-weight: 900;
+  text-align: center;
+}
+
+.error {
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text);
+}
+
+@media (min-width: 640px) {
+  .buttons {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}

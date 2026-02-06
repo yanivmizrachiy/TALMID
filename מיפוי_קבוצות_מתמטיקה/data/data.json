@@ -1,0 +1,36 @@
+{
+  "grades": [
+    {
+      "key": "z",
+      "label": "שכבת ז׳",
+      "groups": [
+        { "id": "z_madit", "name": "ז מדעית", "teacher": "טל נחמיה", "students": [] },
+        { "id": "z_a", "name": "ז הקבצה א", "teacher": "אילנית רז", "students": [] },
+        { "id": "z_a1", "name": "ז הקבצה א1", "teacher": "יניב רז", "students": [] },
+        { "id": "z_mekademet", "name": "ז מקדמת", "teacher": "הילה הנסב", "students": [] }
+      ]
+    },
+    {
+      "key": "h",
+      "label": "שכבת ח׳",
+      "groups": [
+        { "id": "h_madit", "name": "ח הקבצה מדעית", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "h_a", "name": "ח הקבצה א", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "h_a1_1", "name": "ח הקבצה א-1 (קבוצה ראשונה)", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "h_a1_2", "name": "ח הקבצה א-1 (קבוצה שנייה)", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "h_mekademet", "name": "ח הקבצה מקדמת", "teacher": "טרם הוגדר", "students": [] }
+      ]
+    },
+    {
+      "key": "t",
+      "label": "שכבת ט׳",
+      "groups": [
+        { "id": "t_madit", "name": "ט הקבצה מדעית", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "t_a", "name": "ט הקבצה א", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "t_a1_1", "name": "ט הקבצה א-1 (קבוצה ראשונה)", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "t_a1_2", "name": "ט הקבצה א-1 (קבוצה שנייה)", "teacher": "טרם הוגדר", "students": [] },
+        { "id": "t_mekademet", "name": "ט הקבצה מקדמת", "teacher": "טרם הוגדר", "students": [] }
+      ]
+    }
+  ]
+}

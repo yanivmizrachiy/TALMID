@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>הקבצות</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="prefetch" href="data/config.json" />
+    <link rel="prefetch" href="data/data.json" />
+    <script defer src="js/app.js"></script>
+  </head>
+  <body data-page="group" data-grade="">
+    <header class="header" role="banner">
+      <div class="header__inner">
+        <div class="header__titles">
+          <h1 class="header__title" id="group-title"></h1>
+          <p class="header__subtitle" id="group-subtitle"></p>
+        </div>
+        <a class="back" id="back" href="index.html">חזרה</a>
+      </div>
+    </header>
+
+    <main class="main" role="main">
+      <section class="panel" aria-label="תלמידים">
+        <div class="tableWrap" role="region" aria-label="טבלת תלמידים">
+          <table class="table" aria-label="רשימת תלמידים">
+            <thead>
+              <tr>
+                <th class="colNum">#</th>
+                <th>שם תלמיד/ה</th>
+              </tr>
+            </thead>
+            <tbody id="students"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="סיכום">
+        <p class="summary" id="group-total"></p>
+      </section>
+
+      <p class="error" id="error" hidden></p>
+    </main>
+  </body>
+</html>
