@@ -1,7 +1,55 @@
 "use strict";
 
+document.documentElement.classList.add("js");
+
 const CONFIG_URL = "data/config.json";
 const DATA_URL = "data/data.json";
+
+const CACHE_CFG_KEY = "talmid__cfg__v1";
+const CACHE_DATA_KEY = "talmid__data__v1";
+
+function markEntering() {
+  document.body.classList.add("is-entering");
+}
+
+function markReady() {
+  requestAnimationFrame(() => {
+    document.body.classList.remove("is-entering");
+    document.body.classList.add("is-ready");
+  });
+}
+
+function installFastNav() {
+  document.addEventListener("click", (ev) => {
+    const a = ev.target && ev.target.closest ? ev.target.closest("a[href]") : null;
+    if (!a) return;
+
+    if (ev.defaultPrevented) return;
+    if (ev.button !== 0) return;
+    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    if (a.target && a.target !== "_self") return;
+    if (a.hasAttribute("download")) return;
+
+    const href = a.getAttribute("href") || "";
+    if (!href || href.startsWith("#")) return;
+
+    let url;
+    try {
+      url = new URL(href, window.location.href);
+    } catch {
+      return;
+    }
+
+    if (url.origin !== window.location.origin) return;
+    if (!url.pathname.endsWith(".html")) return;
+
+    ev.preventDefault();
+    document.body.classList.add("is-leaving");
+    window.setTimeout(() => {
+      window.location.href = url.href;
+    }, 120);
+  });
+}
 
 function qs(sel) {
   return document.querySelector(sel);
@@ -216,17 +264,43 @@ function renderGroup(cfg, data, gradeKey, groupId) {
 }
 
 async function loadAll() {
-  const [cfgRes, dataRes] = await Promise.all([fetch(CONFIG_URL), fetch(DATA_URL)]);
-  if (!cfgRes.ok || !dataRes.ok) {
-    throw new Error("fetch failed");
+  try {
+    const cachedCfg = sessionStorage.getItem(CACHE_CFG_KEY);
+    const cachedData = sessionStorage.getItem(CACHE_DATA_KEY);
+    if (cachedCfg && cachedData) {
+      return {
+        cfg: JSON.parse(cachedCfg),
+        data: JSON.parse(cachedData),
+      };
+    }
+  } catch {
+    // ignore cache failures
   }
+
+  const [cfgRes, dataRes] = await Promise.all([
+    fetch(CONFIG_URL, { cache: "force-cache" }),
+    fetch(DATA_URL, { cache: "force-cache" }),
+  ]);
+  if (!cfgRes.ok || !dataRes.ok) throw new Error("fetch failed");
+
   const cfg = await cfgRes.json();
   const data = await dataRes.json();
+
+  try {
+    sessionStorage.setItem(CACHE_CFG_KEY, JSON.stringify(cfg));
+    sessionStorage.setItem(CACHE_DATA_KEY, JSON.stringify(data));
+  } catch {
+    // ignore cache failures
+  }
+
   return { cfg, data };
 }
 
 (async function main() {
   hideError();
+
+  markEntering();
+  installFastNav();
 
   try {
     const { cfg, data } = await loadAll();
@@ -235,29 +309,36 @@ async function loadAll() {
 
     if (page === "home") {
       renderHome(cfg, data);
+      markReady();
       return;
     }
 
     if (page === "grade") {
       if (!gradeKey) {
         showError("חסרה שכבה בכתובת");
+        markReady();
         return;
       }
       renderGrade(cfg, data, gradeKey);
+      markReady();
       return;
     }
 
     if (page === "group") {
       if (!gradeKey || !groupId) {
         showError("חסרים פרטים בכתובת");
+        markReady();
         return;
       }
       renderGroup(cfg, data, gradeKey, groupId);
+      markReady();
       return;
     }
 
     showError("דף לא נתמך");
+    markReady();
   } catch {
     showError("לא ניתן לטעון נתונים מקומיים. יש לפתוח דרך שרת מקומי.");
+    markReady();
   }
 })();

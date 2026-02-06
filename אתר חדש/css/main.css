@@ -1,28 +1,37 @@
 :root {
-  --bg: #f3f4f6;
+  --bg: #f6f7fb;
+  --bg2: #eef2ff;
   --panel: #ffffff;
-  --border: #d1d5db;
-  --text: #111827;
-  --muted: #374151;
+  --border: rgba(15, 23, 42, 0.14);
+  --text: #0f172a;
+  --muted: #334155;
 
-  --accent: #2563eb;
+  --accent: #1d4ed8;
+  --accent2: #1e40af;
   --groupName: #0b2a6f;
   --teacher: #0a7a78;
-  --num: #c1121f;
+  --num: #b91c1c;
+
+  --ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+  --enterMs: 140ms;
+  --leaveMs: 120ms;
 
   --radius: 12px;
 }
 
 body[data-grade="z"] {
-  --accent: #2563eb;
+  --accent: #1d4ed8;
+  --accent2: #1e40af;
 }
 
 body[data-grade="h"] {
-  --accent: #7c3aed;
+  --accent: #6d28d9;
+  --accent2: #5b21b6;
 }
 
 body[data-grade="t"] {
   --accent: #0f766e;
+  --accent2: #115e59;
 }
 
 * {
@@ -37,12 +46,12 @@ body {
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg), var(--bg2));
   color: var(--text);
 }
 
 .header {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
   color: #ffffff;
 }
 
@@ -111,6 +120,11 @@ body {
   background: #ffffff;
   color: var(--text);
   text-decoration: none;
+  transition: transform 90ms var(--ease), border-color 120ms var(--ease);
+}
+
+.btn:active {
+  transform: translateY(1px);
 }
 
 .btn__title {
@@ -148,6 +162,11 @@ body {
   background: #ffffff;
   padding: 12px;
   min-height: 56px;
+  transition: transform 90ms var(--ease), border-color 120ms var(--ease);
+}
+
+.groupCard:active {
+  transform: translateY(1px);
 }
 
 .groupCard__name {
@@ -182,6 +201,53 @@ body {
   text-decoration: none;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.back:focus-visible,
+.btn:focus-visible,
+.groupCard:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 2px;
+}
+
+/* Ultra-fast page transitions (only when JS is enabled) */
+html.js body {
+  opacity: 1;
+}
+
+html.js body.is-entering {
+  opacity: 0;
+  transform: translateY(2px);
+}
+
+html.js body.is-ready {
+  opacity: 1;
+  transform: none;
+  transition: opacity var(--enterMs) var(--ease), transform var(--enterMs) var(--ease);
+}
+
+html.js body.is-leaving {
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity var(--leaveMs) var(--ease), transform var(--leaveMs) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --enterMs: 0ms;
+    --leaveMs: 0ms;
+  }
+
+  html.js body.is-entering,
+  html.js body.is-leaving {
+    opacity: 1;
+    transform: none;
+  }
+
+  .btn,
+  .groupCard {
+    transition: none;
+  }
 }
 
 .tableWrap {
