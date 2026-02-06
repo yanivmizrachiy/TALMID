@@ -34,6 +34,29 @@ def _write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def _load_excluded_full_names(team_root: Path) -> set[str]:
+    path = team_root / "נתונים" / "excluded_students.json"
+    if not path.exists():
+        return set()
+    try:
+        data = _read_json(path)
+    except Exception:
+        return set()
+
+    items = data.get("excluded_full_names") or []
+    excluded: set[str] = set()
+    for it in items:
+        if isinstance(it, str):
+            name = _normalize_str(it)
+        elif isinstance(it, dict):
+            name = _normalize_str(it.get("full_name"))
+        else:
+            name = ""
+        if name:
+            excluded.add(re.sub(r"\s+", " ", name).strip())
+    return excluded
+
+
 def _normalize_str(value: Any) -> str:
     if value is None:
         return ""
@@ -250,6 +273,8 @@ def main() -> int:
 
     groups = _load_groups(team_root)
 
+    excluded_names = _load_excluded_full_names(team_root)
+
     mapping = _read_json(mapping_path) if mapping_path.exists() else {"version": 1, "sheets": {}}
     sheets_mapping: dict[str, dict] = mapping.get("sheets") or {}
 
@@ -316,6 +341,14 @@ def main() -> int:
 
             if full_name and (not first_name and not last_name):
                 first_name, last_name = _split_full_name(full_name)
+
+            full_name_for_exclusion = re.sub(
+                r"\s+",
+                " ",
+                (" ".join([p for p in [first_name, last_name] if _normalize_str(p)]) or full_name or "").strip(),
+            ).strip()
+            if full_name_for_exclusion and full_name_for_exclusion in excluded_names:
+                continue
 
             # Skip rows that don't look like students
             if not (full_name or first_name or last_name):

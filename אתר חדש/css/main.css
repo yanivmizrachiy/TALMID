@@ -91,6 +91,41 @@ body {
   white-space: nowrap;
 }
 
+.header__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.header__clock {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  text-align: end;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent), transparent 70%));
+}
+
+.clock__time {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent), transparent 70%);
+}
+
+.clock__date {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.95;
+  white-space: nowrap;
+}
+
 .main {
   max-width: 720px;
   margin: 0 auto;

@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>הקבצות</title>
     <link rel="stylesheet" href="css/main.css" />
     <link rel="prefetch" href="grade.html" />
@@ -18,7 +21,13 @@
           <h1 class="header__title" id="cfg-title"></h1>
           <p class="header__subtitle" id="cfg-subtitle"></p>
         </div>
-        <p class="header__managed" id="cfg-managed"></p>
+        <div class="header__meta">
+          <p class="header__managed" id="cfg-managed"></p>
+          <div class="header__clock" aria-label="תאריך ושעה">
+            <div class="clock__time" id="clock-time"></div>
+            <div class="clock__date" id="clock-date"></div>
+          </div>
+        </div>
       </div>
     </header>
 

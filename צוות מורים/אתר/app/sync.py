@@ -32,6 +32,29 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip())
 
 
+def _load_excluded_full_names(team_root: Path) -> set[str]:
+    path = team_root / "נתונים" / "excluded_students.json"
+    if not path.exists():
+        return set()
+    try:
+        data = _read_json(path)
+    except Exception:
+        return set()
+
+    items = data.get("excluded_full_names") or []
+    excluded: set[str] = set()
+    for it in items:
+        if isinstance(it, str):
+            name = _norm(it)
+        elif isinstance(it, dict):
+            name = _norm(it.get("full_name", ""))
+        else:
+            name = ""
+        if name:
+            excluded.add(name)
+    return excluded
+
+
 def _slug_id(prefix: str, text: str) -> str:
     h = hashlib.sha1(_norm(text).encode("utf-8")).hexdigest()[:16]
     return f"{prefix}_{h}"
@@ -194,6 +217,8 @@ def _add_membership(conn, group_id: str, student_id: str, source: str) -> None:
 def main() -> int:
     team_root = _team_root()
 
+    excluded_names = _load_excluded_full_names(team_root)
+
     conn = connect()
     migrate(conn)
 
@@ -226,6 +251,9 @@ def main() -> int:
             first_name = row.get("first_name", "")
             last_name = row.get("last_name", "")
             full_name = _guess_full_name(first_name, last_name, row.get("full_name", ""))
+
+            if full_name and _norm(full_name) in excluded_names:
+                continue
             homeroom = _norm(row.get("homeroom_class", ""))
             grade = homeroom[:1] if homeroom else ""
             notes = _norm(row.get("notes", ""))
@@ -253,6 +281,9 @@ def main() -> int:
         notes = _norm(row.get("notes", ""))
 
         if not (full_name and grade and math_group):
+            continue
+
+        if full_name in excluded_names:
             continue
 
         # pick unique group by grade+name. If multiple variants exist, keep the first match.
@@ -284,6 +315,21 @@ def main() -> int:
         "INSERT INTO app_meta (key, value) VALUES ('last_sync_at', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
         (datetime.now().isoformat(timespec="seconds"),),
     )
+
+    conn.commit()
+
+    # Hard-delete excluded students so they never appear in the app.
+    # We delete by normalized full_name (names list is small and explicit).
+    for name in sorted(excluded_names):
+        if not name:
+            continue
+        rows = conn.execute("SELECT id FROM students WHERE full_name = ?", (name,)).fetchall()
+        for r in rows:
+            sid = r["id"]
+            # Metrics + memberships are configured with ON DELETE CASCADE,
+            # but delete metrics explicitly for older DBs / safety.
+            conn.execute("DELETE FROM student_metrics WHERE student_id = ?", (sid,))
+            conn.execute("DELETE FROM students WHERE id = ?", (sid,))
 
     conn.commit()
 

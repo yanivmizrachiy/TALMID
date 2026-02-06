@@ -1,0 +1,85 @@
+name: Deploy GitHub Pages (אתר חדש)
+
+on:
+  push:
+    branches: [main]
+    # Deploy on every push to main so the "fixed link" always reflects latest repo state.
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare site
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf site
+          mkdir -p "site"
+
+          # Disable Jekyll processing (avoids unexpected behavior)
+          touch "site/.nojekyll"
+
+          # Publish ONLY the new static site (avoid exposing repo data)
+          cp -R "אתר חדש" "site/אתר חדש"
+
+          # Basic sanity checks (fail fast)
+          test -f "site/אתר חדש/index.html"
+          test -f "site/אתר חדש/grade.html"
+          test -f "site/אתר חדש/group.html"
+          test -f "site/אתר חדש/data/data.json"
+          test -f "site/אתר חדש/data/config.json"
+
+          # Root redirect so users can also use /TALMID/ as a stable link
+          cat > "site/index.html" <<'EOF'
+          <!doctype html>
+          <html lang="he" dir="rtl">
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta http-equiv="refresh" content="0; url=./%D7%90%D7%AA%D7%A8%20%D7%97%D7%93%D7%A9/" />
+              <link rel="canonical" href="./%D7%90%D7%AA%D7%A8%20%D7%97%D7%93%D7%A9/" />
+              <title>הקבצות – מעבר לאתר</title>
+            </head>
+            <body>
+              <script>
+                location.replace("./%D7%90%D7%AA%D7%A8%20%D7%97%D7%93%D7%A9/");
+              </script>
+              <p>מעביר לאתר…</p>
+              <p>
+                אם לא עבר אוטומטית:
+                <a href="./%D7%90%D7%AA%D7%A8%20%D7%97%D7%93%D7%A9/">לחץ כאן</a>
+              </p>
+            </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        name: Deploy
+        uses: actions/deploy-pages@v4

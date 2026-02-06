@@ -5,8 +5,7 @@ document.documentElement.classList.add("js");
 const CONFIG_URL = "data/config.json";
 const DATA_URL = "data/data.json";
 
-const CACHE_CFG_KEY = "talmid__cfg__v1";
-const CACHE_DATA_KEY = "talmid__data__v1";
+const FETCH_TIMEOUT_MS = 12000;
 
 function markEntering() {
   document.body.classList.add("is-entering");
@@ -87,6 +86,16 @@ function hideError() {
   err.textContent = "";
 }
 
+async function fetchWithTimeout(url, options) {
+  const controller = new AbortController();
+  const t = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    window.clearTimeout(t);
+  }
+}
+
 function prefetch(urls) {
   const head = document.head;
   const existing = new Set(
@@ -101,6 +110,35 @@ function prefetch(urls) {
     head.appendChild(link);
     existing.add(href);
   }
+}
+
+function startHomeClock() {
+  const timeEl = qs("#clock-time");
+  const dateEl = qs("#clock-date");
+  if (!timeEl || !dateEl) return;
+
+  const fmtTime = new Intl.DateTimeFormat("he-IL", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  const fmtDate = new Intl.DateTimeFormat("he-IL", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  const tick = () => {
+    const now = new Date();
+    safeText(timeEl, fmtTime.format(now));
+    safeText(dateEl, fmtDate.format(now));
+  };
+
+  tick();
+  window.setInterval(tick, 1000);
 }
 
 function sumStudentsInGrade(grade) {
@@ -140,7 +178,7 @@ function renderHome(cfg, data) {
   const totalSchool = sumAllStudents(data);
   const schoolTotal = qs("#school-total");
   if (schoolTotal) {
-    schoolTotal.innerHTML = `סה״כ תלמידים בבית הספר: <span class="num">${totalSchool}</span>`;
+    schoolTotal.innerHTML = `<span class="num">${totalSchool}</span> תלמידים לומדים בחטיבת הביניים`;
   }
 
   const gradeKeys = ["z", "h", "t"];
@@ -157,7 +195,7 @@ function renderHome(cfg, data) {
 
     const t = createEl("div", "btn__title", label);
     const meta = createEl("div", "btn__meta");
-    meta.innerHTML = `מספר תלמידים בשכבה: <span class="num">${count}</span>`;
+    meta.innerHTML = `<span class="num">${count}</span> תלמידים לומדים ב${label}`;
 
     a.appendChild(t);
     a.appendChild(meta);
@@ -264,33 +302,34 @@ function renderGroup(cfg, data, gradeKey, groupId) {
 }
 
 async function loadAll() {
-  try {
-    const cachedCfg = sessionStorage.getItem(CACHE_CFG_KEY);
-    const cachedData = sessionStorage.getItem(CACHE_DATA_KEY);
-    if (cachedCfg && cachedData) {
-      return {
-        cfg: JSON.parse(cachedCfg),
-        data: JSON.parse(cachedData),
-      };
-    }
-  } catch {
-    // ignore cache failures
-  }
+  // Always fetch fresh data.
+  // GitHub Pages + mobile browsers can keep stale caches; we want the site to be
+  // "always updated" without manual cache busting.
+  const bust = `?v=${Date.now()}`;
 
   const [cfgRes, dataRes] = await Promise.all([
-    fetch(CONFIG_URL, { cache: "force-cache" }),
-    fetch(DATA_URL, { cache: "force-cache" }),
+    fetchWithTimeout(`${CONFIG_URL}${bust}`, { cache: "no-store" }),
+    fetchWithTimeout(`${DATA_URL}${bust}`, { cache: "no-store" }),
   ]);
-  if (!cfgRes.ok || !dataRes.ok) throw new Error("fetch failed");
 
-  const cfg = await cfgRes.json();
-  const data = await dataRes.json();
+  if (!cfgRes.ok) {
+    throw new Error(`cfg fetch failed (${cfgRes.status})`);
+  }
+  if (!dataRes.ok) {
+    throw new Error(`data fetch failed (${dataRes.status})`);
+  }
 
+  let cfg;
+  let data;
   try {
-    sessionStorage.setItem(CACHE_CFG_KEY, JSON.stringify(cfg));
-    sessionStorage.setItem(CACHE_DATA_KEY, JSON.stringify(data));
+    cfg = await cfgRes.json();
   } catch {
-    // ignore cache failures
+    throw new Error("cfg json parse failed");
+  }
+  try {
+    data = await dataRes.json();
+  } catch {
+    throw new Error("data json parse failed");
   }
 
   return { cfg, data };
@@ -309,6 +348,7 @@ async function loadAll() {
 
     if (page === "home") {
       renderHome(cfg, data);
+      startHomeClock();
       markReady();
       return;
     }
@@ -338,7 +378,11 @@ async function loadAll() {
     showError("דף לא נתמך");
     markReady();
   } catch {
-    showError("לא ניתן לטעון נתונים מקומיים. יש לפתוח דרך שרת מקומי.");
+    if (window.location.protocol === "file:") {
+      showError("לא ניתן לטעון נתונים מקומיים. יש לפתוח דרך שרת מקומי.");
+    } else {
+      showError("שגיאה בטעינת הנתונים. נסה לרענן את הדף.");
+    }
     markReady();
   }
 })();
