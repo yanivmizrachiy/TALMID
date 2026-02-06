@@ -19,9 +19,9 @@
   --radius: 12px;
 
   /* Grade accents (same palette as the per-grade theme below) */
-  --gradeZ: #1d4ed8;
-  --gradeH: #6d28d9;
-  --gradeT: #0f766e;
+  --gradeZ: #ec4899; /* pink */
+  --gradeH: #22c55e; /* green */
+  --gradeT: #f97316; /* orange */
 }
 
 body[data-grade="z"] {
