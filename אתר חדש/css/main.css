@@ -27,16 +27,19 @@
 body[data-grade="z"] {
   --accent: var(--gradeZ);
   --accent2: #db2777;
+  --num: var(--gradeZ);
 }
 
 body[data-grade="h"] {
   --accent: var(--gradeH);
   --accent2: #16a34a;
+  --num: var(--gradeH);
 }
 
 body[data-grade="t"] {
   --accent: var(--gradeT);
   --accent2: #ea580c;
+  --num: var(--gradeT);
 }
 
 * {
@@ -106,14 +109,17 @@ body[data-page="home"] .btn__meta {
 
 body[data-page="home"] .btn[data-grade="z"] {
   border-color: color-mix(in srgb, var(--gradeZ), black 8%);
+  --num: var(--gradeZ);
 }
 
 body[data-page="home"] .btn[data-grade="h"] {
   border-color: color-mix(in srgb, var(--gradeH), black 8%);
+  --num: var(--gradeH);
 }
 
 body[data-page="home"] .btn[data-grade="t"] {
   border-color: color-mix(in srgb, var(--gradeT), black 8%);
+  --num: var(--gradeT);
 }
 
 body[data-page="home"] .btn[data-grade="z"] .btn__title {
