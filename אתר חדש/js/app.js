@@ -236,7 +236,7 @@ function renderGrade(cfg, data, gradeKey) {
 
     const countLine = createEl("p", "groupCard__count");
     const c = (grp.students || []).length;
-    countLine.innerHTML = `תלמידים בהקבצה: <span class="num">${c}</span>`;
+    countLine.innerHTML = `<span class="num">${c}</span> תלמידים לומדים ב${grp.name}`;
 
     a.appendChild(name);
     a.appendChild(teacher);
