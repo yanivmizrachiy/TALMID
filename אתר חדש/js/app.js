@@ -164,6 +164,29 @@ function createEl(tag, className, text) {
   return el;
 }
 
+function withBPrefix(label) {
+  const s = String(label || "").trim();
+  if (!s) return "";
+  // Hebrew usually attaches the prefix (בכיתה, בהקבצה, בחטיבה).
+  // For Latin/digits, keep a space for readability.
+  return /^[A-Za-z0-9]/.test(s) ? `ב ${s}` : `ב${s}`;
+}
+
+function normalizeGroupLabelForCount(name) {
+  const s = String(name || "").trim();
+  if (!s) return s;
+
+  // Many group names start with the grade letter (ז/ח/ט). For the sentence
+  // "תלמידים לומדים ב…" we prefer "בהקבצה …" rather than "בח …".
+  const m = s.match(/^([זחט])\s+(.*)$/);
+  if (!m) return s;
+
+  const rest = m[2].trim();
+  if (!rest) return s;
+  if (rest === "מדעית") return "הקבצה מדעית";
+  return rest;
+}
+
 function renderHome(cfg, data) {
   setGradeAccent("");
 
@@ -236,7 +259,8 @@ function renderGrade(cfg, data, gradeKey) {
 
     const countLine = createEl("p", "groupCard__count");
     const c = (grp.students || []).length;
-    countLine.innerHTML = `<span class="num">${c}</span> תלמידים לומדים ב${grp.name}`;
+    const groupLabelForCount = normalizeGroupLabelForCount(grp.name);
+    countLine.innerHTML = `<span class="num">${c}</span> תלמידים לומדים ${withBPrefix(groupLabelForCount)}`;
 
     a.appendChild(name);
     a.appendChild(teacher);
