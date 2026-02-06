@@ -255,6 +255,7 @@ function renderHome(cfg, data) {
 
     const a = document.createElement("a");
     a.className = "btn";
+    a.setAttribute("data-grade", key);
     a.href = `grade.html?g=${encodeURIComponent(key)}`;
 
     const t = createEl("div", "btn__title", label);

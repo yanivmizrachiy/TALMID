@@ -17,6 +17,11 @@
   --leaveMs: 120ms;
 
   --radius: 12px;
+
+  /* Grade accents (same palette as the per-grade theme below) */
+  --gradeZ: #1d4ed8;
+  --gradeH: #6d28d9;
+  --gradeT: #0f766e;
 }
 
 body[data-grade="z"] {
@@ -83,6 +88,32 @@ body[data-page="home"] .buttons {
 
 body[data-page="home"] .btn {
   height: 100%;
+}
+
+/* Home buttons: centered text + distinct border per grade */
+body[data-page="home"] .btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-width: 2px;
+}
+
+body[data-page="home"] .btn__meta {
+  margin-top: 8px;
+}
+
+body[data-page="home"] .btn[data-grade="z"] {
+  border-color: color-mix(in srgb, var(--gradeZ), black 8%);
+}
+
+body[data-page="home"] .btn[data-grade="h"] {
+  border-color: color-mix(in srgb, var(--gradeH), black 8%);
+}
+
+body[data-page="home"] .btn[data-grade="t"] {
+  border-color: color-mix(in srgb, var(--gradeT), black 8%);
 }
 
 .header {
