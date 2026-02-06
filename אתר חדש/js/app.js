@@ -7,6 +7,50 @@ const DATA_URL = "data/data.json";
 
 const FETCH_TIMEOUT_MS = 12000;
 
+// Performance: cache JSON in sessionStorage for a short TTL.
+// This makes navigation (home → grade → group) feel instant, while still
+// fetching fresh data regularly so the site stays up-to-date.
+const SESSION_CACHE_KEY = "talmid_json_cache_v1";
+const SESSION_CACHE_TTL_MS = 90 * 1000;
+
+// Keep a stable cache-bust token for a limited time to make prefetch useful.
+const SESSION_BUST_KEY = "talmid_bust_v1";
+const SESSION_BUST_TTL_MS = 10 * 60 * 1000;
+
+function readSessionJSON(key) {
+  try {
+    const raw = window.sessionStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function writeSessionJSON(key, value) {
+  try {
+    window.sessionStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Ignore (private mode / storage quota / disabled storage).
+  }
+}
+
+function getSessionBust() {
+  const now = Date.now();
+  const cached = readSessionJSON(SESSION_BUST_KEY);
+  if (cached && typeof cached.v === "number" && typeof cached.ts === "number") {
+    if (now - cached.ts <= SESSION_BUST_TTL_MS) return cached.v;
+  }
+  const v = now;
+  writeSessionJSON(SESSION_BUST_KEY, { v, ts: now });
+  return v;
+}
+
+function warmPrefetchJSON(bust) {
+  const v = typeof bust === "number" ? bust : getSessionBust();
+  prefetch([`${CONFIG_URL}?v=${v}`, `${DATA_URL}?v=${v}`]);
+}
+
 function markEntering() {
   document.body.classList.add("is-entering");
 }
@@ -207,6 +251,8 @@ function renderHome(cfg, data) {
   const gradeKeys = ["z", "h", "t"];
   prefetch(gradeKeys.map((k) => `grade.html?g=${encodeURIComponent(k)}`));
 
+  const frag = document.createDocumentFragment();
+
   for (const key of gradeKeys) {
     const grade = findGrade(data, key);
     const label = grade ? grade.label : "שכבה";
@@ -222,8 +268,10 @@ function renderHome(cfg, data) {
 
     a.appendChild(t);
     a.appendChild(meta);
-    container.appendChild(a);
+    frag.appendChild(a);
   }
+
+  container.appendChild(frag);
 }
 
 function renderGrade(cfg, data, gradeKey) {
@@ -249,6 +297,8 @@ function renderGrade(cfg, data, gradeKey) {
 
   const groupPrefetch = [];
 
+  const frag = document.createDocumentFragment();
+
   for (const grp of grade.groups || []) {
     const a = document.createElement("a");
     a.className = "groupCard";
@@ -265,10 +315,12 @@ function renderGrade(cfg, data, gradeKey) {
     a.appendChild(name);
     a.appendChild(teacher);
     a.appendChild(countLine);
-    groups.appendChild(a);
+    frag.appendChild(a);
 
     groupPrefetch.push(a.href);
   }
+
+  groups.appendChild(frag);
 
   prefetch(groupPrefetch);
 
@@ -301,6 +353,7 @@ function renderGroup(cfg, data, gradeKey, groupId) {
   tbody.innerHTML = "";
 
   const students = grp.students || [];
+  const frag = document.createDocumentFragment();
   for (let i = 0; i < students.length; i++) {
     const tr = document.createElement("tr");
 
@@ -309,8 +362,10 @@ function renderGroup(cfg, data, gradeKey, groupId) {
 
     tr.appendChild(tdNum);
     tr.appendChild(tdName);
-    tbody.appendChild(tr);
+    frag.appendChild(tr);
   }
+
+  tbody.appendChild(frag);
 
   const totalEl = qs("#group-total");
   if (totalEl) {
@@ -326,10 +381,22 @@ function renderGroup(cfg, data, gradeKey, groupId) {
 }
 
 async function loadAll() {
-  // Always fetch fresh data.
-  // GitHub Pages + mobile browsers can keep stale caches; we want the site to be
-  // "always updated" without manual cache busting.
-  const bust = `?v=${Date.now()}`;
+  const now = Date.now();
+  const cached = readSessionJSON(SESSION_CACHE_KEY);
+  if (
+    cached &&
+    typeof cached.ts === "number" &&
+    cached.cfg &&
+    cached.data &&
+    now - cached.ts <= SESSION_CACHE_TTL_MS
+  ) {
+    return { cfg: cached.cfg, data: cached.data };
+  }
+
+  // Fetch fresh data.
+  // We still bust caches to avoid stale GitHub Pages/mobile caches, but we keep
+  // a stable bust token for a short window to make prefetch effective.
+  const bust = `?v=${getSessionBust()}`;
 
   const [cfgRes, dataRes] = await Promise.all([
     fetchWithTimeout(`${CONFIG_URL}${bust}`, { cache: "no-store" }),
@@ -356,6 +423,8 @@ async function loadAll() {
     throw new Error("data json parse failed");
   }
 
+  writeSessionJSON(SESSION_CACHE_KEY, { ts: now, cfg, data });
+
   return { cfg, data };
 }
 
@@ -364,6 +433,7 @@ async function loadAll() {
 
   markEntering();
   installFastNav();
+  warmPrefetchJSON(getSessionBust());
 
   try {
     const { cfg, data } = await loadAll();
