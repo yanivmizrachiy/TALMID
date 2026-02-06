@@ -46,11 +46,6 @@ function getSessionBust() {
   return v;
 }
 
-function warmPrefetchJSON(bust) {
-  const v = typeof bust === "number" ? bust : getSessionBust();
-  prefetch([`${CONFIG_URL}?v=${v}`, `${DATA_URL}?v=${v}`]);
-}
-
 function markEntering() {
   document.body.classList.add("is-entering");
 }
@@ -395,12 +390,12 @@ async function loadAll() {
 
   // Fetch fresh data.
   // We still bust caches to avoid stale GitHub Pages/mobile caches, but we keep
-  // a stable bust token for a short window to make prefetch effective.
+  // a stable bust token for a short window to make revalidation cheap.
   const bust = `?v=${getSessionBust()}`;
 
   const [cfgRes, dataRes] = await Promise.all([
-    fetchWithTimeout(`${CONFIG_URL}${bust}`, { cache: "no-store" }),
-    fetchWithTimeout(`${DATA_URL}${bust}`, { cache: "no-store" }),
+    fetchWithTimeout(`${CONFIG_URL}${bust}`, { cache: "no-cache" }),
+    fetchWithTimeout(`${DATA_URL}${bust}`, { cache: "no-cache" }),
   ]);
 
   if (!cfgRes.ok) {
@@ -433,7 +428,6 @@ async function loadAll() {
 
   markEntering();
   installFastNav();
-  warmPrefetchJSON(getSessionBust());
 
   try {
     const { cfg, data } = await loadAll();
