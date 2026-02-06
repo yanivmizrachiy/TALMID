@@ -284,7 +284,7 @@ function renderGrade(cfg, data, gradeKey) {
 
   const subtitle = qs("#grade-subtitle");
   if (subtitle) {
-    subtitle.innerHTML = `סה״כ תלמידים בשכבה: <span class="num">${total}</span>`;
+    subtitle.innerHTML = `<span class="num">${total}</span> תלמידים לומדים ${withBPrefix(grade.label)}`;
   }
 
   const groups = qs("#groups");

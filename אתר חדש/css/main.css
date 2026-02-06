@@ -139,6 +139,10 @@ body[data-page="home"] .btn[data-grade="t"] .btn__title {
   color: #ffffff;
 }
 
+.header .num {
+  color: rgba(255, 255, 255, 0.98);
+}
+
 .header__inner {
   max-width: 720px;
   margin: 0 auto;
